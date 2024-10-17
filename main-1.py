@@ -426,7 +426,7 @@ def get_3_b():
     
     st.write('experience_level - Gráfico de Barras v2')
     
-    teste=sns.barplot(x=percentual_1.index,             # `y` recebe o conjunto de valores que correspondem ao eixo x.
+    teste=sns.barplot(x=frequencia_1.index,             # `y` recebe o conjunto de valores que correspondem ao eixo x.
             y=frequencia_1,               # `y` recebe o conjunto de valores que correspondem ao eixo y.
             color="blue",                    # `color` recebe uma string com o nome de uma cor para as barras.
             label='Qtd.')                     # `label` será o "nome" que este gráfico receberá, utilizaremos este "nome" para
