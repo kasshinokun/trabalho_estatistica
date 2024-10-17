@@ -79,6 +79,8 @@ import scipy
 import altair as alt
 #ver site: https://www.datacamp.com/tutorial/altair-in-python
 
+#pip install seaborn #--------------------------->Revisão Gabriel
+import seaborn as sns #-------------------------->Revisão Gabriel
 
 #-------------------------------------------------Carregando a base de dados em CSV/Excel/MySQL-------------------------------------------------#
 #conexao MySQL:
@@ -408,7 +410,8 @@ def get_3_b():
                           'Tabelas e Gráficos',
                           ['Selecione uma opção',
                           'Tabela de Frequência',
-                          'Gráfico de Barras'])
+                          'Gráfico de Barras',
+                          'Gráfico de Barras v2'])  #-------------------------->Revisão Gabriel
   if subtopic_graph == 'Selecione uma opção':
      st.write("Ao escolher uma opção, será carregado os gráficos ou tabelas deste tópico.")
   elif subtopic_graph == 'Tabela de Frequência':
@@ -426,7 +429,25 @@ def get_3_b():
     #Exibe o Gráfico de Barras
     st.write('employment_type- Gráfico de Barras')
     st.bar_chart(dist_freq_quantitativas_2)
-#----------------> 
+
+#------------------------------------------>Revisão Gabriel - Inicio 
+  elif subtopic_graph == 'Gráfico de Barras v2':
+    #Exibe o Gráfico de Barras
+    
+    st.write('experience_level - Gráfico de Barras v2')
+    
+    teste=sns.barplot(x=frequencia_1.index,             # `y` recebe o conjunto de valores que correspondem ao eixo x.
+            y=frequencia_1,               # `y` recebe o conjunto de valores que correspondem ao eixo y.
+            color="blue",                    # `color` recebe uma string com o nome de uma cor para as barras.
+            label='Qtd.')                     # `label` será o "nome" que este gráfico receberá, utilizaremos este "nome" para
+                                             # gerar uma legenda para nosso gráfico.
+    plt.title('experience_level\nGráfico de Barras v2')         # Adiciona título ao gráfico
+    plt.ylabel('Frequência')                     # Adiciona um rótulo ao eixo y
+    plt.xlabel('Quantidade')                     # Adiciona um rótulo ao eixo x
+    plt.legend()
+    # Display the plot in Streamlit
+    st.pyplot(teste.figure)
+#------------------------------------------>Revisão Gabriel - Fim
   
 def get_3_c():
   #Se CSV:
