@@ -246,29 +246,35 @@ def quest_1():
   de forma adequada, para representar\n 
   a variável salário_in_usd.\n
   (não finalizado)""")
-  
+
   # Se Excel:
   df2 = data_upload_excel()
-  
+
   # Calcular o número de faixas (k) usando a Regra de Sturges, sendo n o tamanho da amostra
   n = len(df2['salary_in_usd'])  
   k = int(1 + 3.322 * np.log10(n))
-  
+
   # Determinar o menor e o maior valor da coluna salary_in_usd
   menor_valor = df2['salary_in_usd'].min()
   maior_valor = df2['salary_in_usd'].max()
-  
+
   # Definir os limites das faixas manualmente
   faixas = np.linspace(menor_valor, maior_valor, k + 1)
-  
+
+  # Ajustar o primeiro limite inferior manualmente para ser 15000
+  faixas[0] = 15000
+
   # Definir as faixas de salários
   faixas_salario = pd.cut(df2['salary_in_usd'], bins=faixas, include_lowest=True)
-  
+
   # Calcular as frequências
   frequencia = faixas_salario.value_counts(sort=False)
   percentual = frequencia / frequencia.sum() * 100
   freq_acumulada = frequencia.cumsum()
   perc_acumulada = percentual.cumsum()
+
+  # Ajustar o valor da última célula da frequência relativa acumulada para 100%
+  perc_acumulada.iloc[-1] = 100.0
 
   # Extrair os limites inferiores e superiores das faixas
   limites_inferiores = [interval.left for interval in faixas_salario.cat.categories]
@@ -276,6 +282,9 @@ def quest_1():
 
   # Construir a coluna com as faixas de salário
   faixas = [f"{inf} |-- {sup}" for inf, sup in zip(limites_inferiores, limites_superiores)]
+
+  # Tratar o último intervalo para incluir o limite superior
+  faixas[-1] = f"{limites_inferiores[-1]} |--| {limites_superiores[-1]}"
 
   # Construir o DataFrame com as colunas necessárias
   dist_freq = pd.DataFrame({
@@ -293,6 +302,7 @@ def quest_1():
 
   # Exibir a tabela de frequências no Streamlit
   st.dataframe(data=dist_freq, use_container_width=True)
+
 
 
 
