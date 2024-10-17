@@ -887,15 +887,32 @@ presença de valores discrepantes e as médias).""")
 
 
 #---------------------------------------------------------------Questão 9-----------------------------------------------------------------------#
-def quest_9():
+def quest_9(): #-------------------------------------Revisão Gabriel - Início
   st.write("""Questão 9\n
 Cite uma situação hipotética em que o gráfico de linhas seria adequado para representar tais 
 
 \n dados. Quais informações podemos obter ao utilizar um gráfico de linhas?""")
 
+#Moda
+#Mediana
+#Média
 
-
-
+#------>Comentário da situação hipotética
+  st.write("Comentário da situação hipotética\n")
+  st.write("""Como o gráfico de linha visa gerar uma análise de tendência, na base de dados cedida\n
+  seria interessante avaliar a coluna 'work_year' ante as colunas, por exemplo:\n
+  
+  'experience_level', 'employment_type', 'job_title', dentre outras similares\n
+   carecendo adequações pontuais dada a variabilidade dos critérios nominais""") 
+  
+#------>Aplicação da situação hipotética  
+  df=data_upload_excel()
+  merge_crosstab = pd.crosstab(df['work_year'],
+                            df['experience_level'],
+                            normalize="all").mul(100).round(1)
+  st.line_chart(merge_crosstab,x_label='work_year',y_label='qtd. in experience_level')
+  
+#----------------------------------------------------Revisão Gabriel - Fim
 
 #---------------------------------------------------------------Questão 10----------------------------------------------------------------------#
 
