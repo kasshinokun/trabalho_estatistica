@@ -236,7 +236,7 @@ def data_upload_csv():
 
 #se Excel:
 def data_upload_excel():
-  df = pd.read_excel("Dataset salary 2024.xlsx")
+  df = pd.read_excel("../Dataset salary 2024.xlsx")
   return df
 
 
@@ -251,8 +251,7 @@ def quest_1():
   st.write("""Questão 1\n
   Construa uma tabela de frequências,\n 
   de forma adequada, para representar\n 
-  a variável salário_in_usd.\n
-  (não finalizado)""")
+  a variável salário_in_usd.\n""")
 
   # Se Excel:
   df2 = data_upload_excel()
@@ -332,8 +331,7 @@ def quest_2():
   st.write("""Questão 2\n
   Construa uma tabela de frequências,\n 
   de forma adequada, para representar\n 
-  a variável job_title.\n
-  (não finalizado)""")
+  a variável job_title.\n""")
   #Se CSV:
   #df1=data_upload_csv()
   #Se Excel:
@@ -348,7 +346,7 @@ def quest_2():
   #e o percentual:
   dist_freq_qualitativas = pd.DataFrame({
       'Frequência': frequencia,
-      'Porcentagem(%)': percentual
+      'Frequência relativa (%)': percentual
   })
 
   # Adicionar a linha "Total"
@@ -415,7 +413,8 @@ def get_3_a():
   elif subtopic_graph == 'Gráfico de Barras':
     #Exibe o Gráfico de Barras
     st.write('experience_level - Gráfico de Barras')
-    st.bar_chart(dist_freq_quantitativas_graf_barras)
+    st.bar_chart(dist_freq_quantitativas_graf_barras, x_label="Experience Level",
+                y_label="Frequência absoluta")
 
 
 #---------------->
@@ -461,7 +460,8 @@ def get_3_b():
   elif subtopic_graph == 'Gráfico de Barras':
     #Exibe o Gráfico de Barras
     st.write('employment_type- Gráfico de Barras')
-    st.bar_chart(dist_freq_quantitativas_2_graf_barras)
+    st.bar_chart(dist_freq_quantitativas_2_graf_barras, x_label="employment_type",
+                y_label="Frequência absoluta")
 
 #------------------------------------------>Revisão Gabriel - Inicio
   elif subtopic_graph == 'Gráfico de Barras v2':
@@ -531,7 +531,8 @@ def get_3_c():
   elif subtopic_graph == 'Gráfico de Barras':
     st.write('company_size - Gráfico de Barras')
     #Exibe o Gráfico de Barras
-    st.bar_chart(dist_freq_quantitativas_graf_barras)
+    st.bar_chart(dist_freq_quantitativas_graf_barras, x_label="company_size",
+                y_label="Frequência absoluta")
 
 
 #------------------------------>Quantitativos(podem ser unidos por similaridade)
@@ -590,7 +591,7 @@ def get_3_d():
     # Adicionar títulos e labels
     plt.title('Histograma da Distribuição de Salários em USD', fontsize=16)
     plt.xlabel('Faixas de Salário (USD)', fontsize=14)
-    plt.ylabel('Frequência', fontsize=14)
+    plt.ylabel('Frequência absoluta', fontsize=14)
 
     # Ajustar os valores do eixo x para os limites das faixas
     plt.xticks(bin_edges.round(2), rotation=45)  # Mostrar os limites inferiores e superiores no eixo x
@@ -651,7 +652,8 @@ def get_3_e():
   elif subtopic_graph == 'Gráfico de Barras':
     #Exibe o Gráfico de Barras
     st.write('remote_ratio - Gráfico de Barras')
-    st.bar_chart(dist_freq_quantitativas_graf_barras)
+    st.bar_chart(dist_freq_quantitativas_graf_barras, x_label="remote_ratio",
+                y_label="Frequência absoluta")
 
 
 #---------------->
@@ -755,42 +757,57 @@ def quest_4_topics():
 def quest_5():
   st.write(
       """Questão 5\nConstruir uma tabela de contingência mostrando a frequência e um dos percentuais (da linha, 
-\n da coluna OU do total geral) entre as variáveis experience_level e remote_ratio. Construa um gráfico 
+      \n da coluna OU do total geral) entre as variáveis experience_level e remote_ratio. Construa um gráfico 
+      \n adequado para representar os dados dessa tabela. Escreva um pequeno parágrafo citando os principais achados.""")
+  
+  # Carregar dados (modifique conforme sua fonte de dados)
+  df2 = data_upload_excel()  # ou data_upload_csv(), data_upload_mysql()
 
-\n adequado para representar os dados dessa tabela. Escreva um pequeno parágrafo citando os 
-
-\n principais achados.""")
-  #Se CSV:
-  #df1=data_upload_csv()
-  #Se Excel:
-  df2 = data_upload_excel()
-  #ou MySQL:
-  #df3=data_upload_mysql()
-
-  #fonte: acesse o site a seguir
-  #https://acervolima.com/tabela-de-contingencia-em-python/
-  #2 variáveis
-  merge_crosstab = pd.crosstab(df2['experience_level'],
-                               df2['remote_ratio'],
-                               margins=True,
-                               margins_name="Total")
-
-  st.write('experience_level x remote_ratio - Valores')
+  # Tabela de contingência de frequências absolutas
+  merge_crosstab = pd.crosstab(df2['experience_level'], 
+                                df2['remote_ratio'], 
+                                margins=True, 
+                                margins_name="Total")
+  
+  # Renomear as colunas e adicionar rótulo para 'remote_ratio'
+  merge_crosstab.columns = [f"{col} (%)" if col != "Total" else col for col in merge_crosstab.columns]
+  merge_crosstab.index.name = "experience_level/remote_ratio"
+  
+  # Exibir a tabela de frequências absolutas
+  st.write('Tabela de contingência: experience_level x remote_ratio - Frequências Absolutas')
   st.dataframe(merge_crosstab)
-  merge_crosstab2 = pd.crosstab(df2['experience_level'],
-                                df2['remote_ratio'],
-                                margins=True,
-                                margins_name="Total",
+  
+  # Tabela de contingência com porcentagens (normalizada)
+  merge_crosstab2 = pd.crosstab(df2['experience_level'], 
+                                df2['remote_ratio'], 
+                                margins=True, 
+                                margins_name="Total", 
                                 normalize="all").mul(100).round(1)
-  st.write('experience_level x remote_ratio - porcentagem')
+  
+  # Adicionar o símbolo de porcentagem às células (exceto na coluna 'Total')
+  merge_crosstab2 = merge_crosstab2.map(lambda x: f"{x}%" if x != 'Total' else x)
+  
+  # Renomear colunas com o "%" e adicionar rótulos para 'remote_ratio'
+  merge_crosstab2.columns = [f"{col} (%)" if col != "Total" else col for col in merge_crosstab2.columns]
+  merge_crosstab2.index.name = "experience_level/remote_ratio"
+  
+  # Exibir a tabela de porcentagens
+  st.write('Tabela de contingência: experience_level x remote_ratio - Porcentagens (%)')
   st.dataframe(merge_crosstab2)
-  st.write('experience_level x remote_ratio - Gráfico de Barras')
-  merge_crosstab3 = pd.crosstab(df2['experience_level'],
-                                df2['remote_ratio'],
-                                margins=False)
+  
+  # Gráfico de barras empilhadas (frequência absoluta)
+  st.write('Gráfico de Barras Empilhadas: experience_level x remote_ratio - Frequências absolutas')
+  # Gerar a tabela de contingência sem as margens
+  merge_crosstab3 = pd.crosstab(df2['experience_level'], df2['remote_ratio'], margins=False)
+
+  # Adicionar o símbolo "%" nos valores de remote_ratio
+  merge_crosstab3.columns = [f"remote_ratio = {col}%" for col in merge_crosstab3.columns]
+
+  # Gerar o gráfico de barras empilhadas com as colunas renomeadas
   st.bar_chart(merge_crosstab3,
-               x_label="experience_level",
-               y_label="remote_ratio")
+              x_label="Experience Level",
+              y_label="Frequência Absoluta")
+
 
 
 #---------------------------------------------------------------Questão 6-----------------------------------------------------------------------#
