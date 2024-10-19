@@ -25,9 +25,7 @@ import streamlit as st
 #-->pode dar erro de caching_sha2_password mesmo se
 #-->alterar para mysql_native_password, o Python não
 #consegue perceber a mudança
-import mysql.connector
 
-from mysql.connector import errorcode
 
 #----->Instale o Pandas, se não o possuir no PC:
 #-->rode por favor
@@ -86,143 +84,6 @@ import seaborn as sns  #-------------------------->Revisão Gabriel
 #-------------------------------------------------Carregando a base de dados em CSV/Excel/MySQL-------------------------------------------------#
 #conexao MySQL:
 #criar arquivo de credenciais se não existe, por parâmetros
-def generate_toml(host, port, database, username, password, table):
-
-  type_sgbd = "mysql"  #Mudar se necessário
-
-  if isinstance(host, str) and isinstance(port, int) and isinstance(
-      database, str) and isinstance(username, str) and isinstance(
-          password, str) and isinstance(table, str):
-    print("Valores Válidos")
-    try:
-      with open(".streamlit/secrets.toml", "r"):
-        print("Arquivo Existe.")
-    except:
-      try:
-        os.mkdir('.streamlit')
-
-        #usar se for definir o charset do bay
-        start_charset = ("""={""")
-        mid_charset = "charset='"
-        type_charset = "xxx"
-        end_charset = ("""'}""")
-
-        #texto-base do arquivo de credenciais
-        texto = (f'''
-#Criado por: função do Python
-#Local: .streamlit/secrets.toml
-
-['{type_sgbd}']
-dialect = '{type_sgbd}'
-host = '{host}'  #Mudar host se necessario
-port = {port}  #Mudar porta se necessario
-database = '{database}'  #Mudar banco se necessario
-user = '{username}'  #Mudar usario se necessario
-password = '{password}'  #Mudar senha se necessario
-table='{table}'  #Mudar nome da tabela se necessario
-
-#If you use query when defining your connection, 
-#you must use streamlit>=1.35.0.
-#query{start_charset}{mid_charset}{type_charset}{end_charset}
-
-                ''')
-        #query = { charset = "xxx" }
-        print(texto)
-
-        with open(".streamlit/secrets.toml", "w", encoding="utf-8") as arquivo:
-          arquivo.write(texto)
-
-      except OSError as os_erro_arquivo:
-        print("falha no processo de criação do arquivo.")
-        print(os_erro_arquivo)
-
-  else:
-    print("Valores Inválidos, não são Strings.")
-
-
-#Solicitará suas credenciais para leitura inicial e checagem
-def get_read_toml():
-
-  try:
-    with open(".streamlit/secrets.toml", "r") as arquivo:
-      print()
-      config = toml.load(arquivo)
-      #Imprimindo todo o arquivo de credenciais(.toml) obtido
-      print(config)
-
-  except Exception as erro:
-    print("Erro encontrado.")
-    print(erro)
-
-
-#Realizar conexao MySQL:
-def get_from_mysql(HOST, BANCO_MYSQL, SENHA, USUARIO, TABELA_MYSQL):
-  #estabelecendo conexão
-  try:
-    meu_banco = mysql.connector.connect(host=HOST,
-                                        user=USUARIO,
-                                        password=SENHA,
-                                        database=BANCO_MYSQL)
-    print("database online")
-    if meu_banco and meu_banco.is_connected():
-      with meu_banco.cursor() as cursor:
-        #resultado = cursor.execute("SELECT * FROM %s",TABELA_MYSQL)
-        sql_select = (f"SELECT * FROM `{BANCO_MYSQL}.{TABELA_MYSQL}`")
-        resultado = cursor.execute(sql_select)
-        linhas_mysql = resultado.fetchall()
-        colunas_mysql = tuple(meu_banco.execute(resultado).keys())
-        df = pd.DataFrame(linhas_mysql, columns=colunas_mysql, index=False)
-      return df
-    else:
-      print("Não foi possível obter os dados.")
-      return None
-  except mysql.connector.Error as erro_conectar:
-    if erro_conectar.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-      print("Algo está errado com %s ou %s", USUARIO, SENHA)
-    elif erro_conectar.errno == errorcode.ER_BAD_DB_ERROR:
-      print("%s não existe", BANCO_MYSQL)
-    else:
-      print(erro_conectar)
-    return None
-
-
-#Solicitará suas credenciais e atribuirá a variaveis
-def get_from_toml_to_mysql():
-
-  #criar arquivo de credenciais se não existe
-  generate_toml("localhost", 3306, "xxx", "xxx", "xxx", "xxx")
-  #-->  host,porta,database,usuario,senha,tabela
-
-  #verificar se arquivo de credenciais foi criado
-  #e realiza a leitura inicial:
-  get_read_toml()
-
-  #verificar se arquivo de credenciais existe:
-  try:
-    print("Acessando arquivo de crednciais MySQL.....")
-    # Lendo dados
-    toml_data = toml.load(".streamlit/secrets.toml")
-    # salvando cada credencial em uma variável
-    HOST = toml_data['mysql']['host']
-    BANCO_MYSQL = toml_data['mysql']['database']
-    SENHA = toml_data['mysql']['password']
-    USUARIO = toml_data['mysql']['user']
-    PORTA = toml_data['mysql']['port']
-    TABELA_MYSQL = toml_data['mysql']['table']
-    print("Exibindo arquivo de credenciais MySQL:")
-    print(HOST)
-    print(BANCO_MYSQL)
-    print(SENHA)
-    print(USUARIO)
-    print(PORTA)
-    print(TABELA_MYSQL)
-
-    return get_from_mysql(HOST, BANCO_MYSQL, SENHA, USUARIO, TABELA_MYSQL)
-  except Exception as erro:
-    print("Erro encontrado.")
-    print(erro)
-    return None
-
 
 #cache do streamlit
 @st.cache_data
@@ -239,10 +100,6 @@ def data_upload_excel():
   df = pd.read_excel("Dataset salary 2024.xlsx")
   return df
 
-
-#se MySQL:
-def data_upload_mysql():
-  return get_from_mysql()
 
 
 #---------------------------------------------------------Executando as questões----------------------------------------------------------------#
